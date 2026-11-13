@@ -1,0 +1,10 @@
+{
+  "hm": {
+    "design_hint": "Hookmatch: visitors from a matched ad see different content here. Visitors from other sources see the default above.",
+    "empty_headline": "Add a default headline in the block settings",
+    "empty_subheadline": "Add a default subheadline in the block settings",
+    "empty_badge": "Default badge (hidden for other visitors)",
+    "empty_media": "Add a default image in the block settings",
+    "media_alt": "Promotional image"
+  }
+}

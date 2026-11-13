@@ -1,0 +1,52 @@
+# This file stores configurations for your Shopify app.
+client_id = ""  # filled by `shopify app config link`
+name = "Hookmatch"
+handle = "hookmatch"
+application_url = "https://YOUR-APP-HOST"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+# read_orders: orders/create webhook. read_files: resolve a file picked in the angle editor to its CDN URL. write_app_proxy: required by Shopify for any app with an app proxy.
+# App-owned metafields ($app namespace) need no scope.
+scopes = "read_orders,read_files,write_app_proxy"
+use_legacy_install_flow = false
+
+[auth]
+redirect_urls = [
+  "https://YOUR-APP-HOST/auth/callback"
+]
+
+# Storefront beacon: https://<shop>/apps/hm/hit -> https://YOUR-APP-HOST/proxy/hit
+[app_proxy]
+url = "https://YOUR-APP-HOST/proxy"
+subpath = "hm"
+prefix = "apps"
+
+[webhooks]
+api_version = "2026-10"
+
+  # Handled by: /app/routes/webhooks.app.uninstalled.tsx
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/app/uninstalled"
+  topics = ["app/uninstalled"]
+
+  # Handled by: /app/routes/webhooks.app.scopes_update.tsx
+  [[webhooks.subscriptions]]
+  topics = [ "app/scopes_update" ]
+  uri = "/webhooks/app/scopes_update"
+
+  # Handled by: /app/routes/webhooks.orders.create.tsx
+  [[webhooks.subscriptions]]
+  topics = [ "orders/create" ]
+  uri = "/webhooks/orders/create"
+
+  # Handled by: /app/routes/webhooks.app.subscriptions_update.tsx
+  [[webhooks.subscriptions]]
+  topics = [ "app_subscriptions/update" ]
+  uri = "/webhooks/app/subscriptions_update"
+
+  # Mandatory compliance topics for public apps. Handled by: /app/routes/webhooks.compliance.tsx
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/compliance"
+  compliance_topics = [ "customers/data_request", "customers/redact", "shop/redact" ]

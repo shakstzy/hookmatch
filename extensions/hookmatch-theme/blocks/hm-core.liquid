@@ -1,0 +1,46 @@
+{%- comment -%}
+  Hookmatch app embed (head). Reads the app-owned shop metafield $app:hm.config,
+  prints it as inert JSON and loads hm.js. Prints nothing if the config is absent
+  or the theme editor is open. Config is written by the app, never by the merchant.
+  Auto mode (default) also prints the selector overrides (#hm-auto) and hides the theme hero
+  while a match is pending; hm.js then swaps the theme's own headline, subheadline and media.
+{%- endcomment -%}
+{%- assign hm_cfg = shop.metafields['$app:hm'].config.value -%}
+{%- if hm_cfg != blank -%}
+  {%- unless request.design_mode -%}
+{%- assign hm_h = block.settings.headline_selector | remove: '<' | remove: '{' | remove: '}' | strip -%}
+{%- assign hm_s = block.settings.subheadline_selector | remove: '<' | remove: '{' | remove: '}' | strip -%}
+{%- assign hm_m = block.settings.media_selector | remove: '<' | remove: '{' | remove: '}' | strip -%}
+<style>.hm-pending [data-hm-slot]{visibility:hidden}{% unless block.settings.mode == 'blocks' %}.hm-a.hm-pending :is({{ hm_h | default: 'main h1,main:not(:has(h1))>:first-child h2' }},{{ hm_s | default: 'main>:has(h1) p' }},{{ hm_m | default: 'main>:is(:first-child,:has(h1)) :is(img,video)' }}){visibility:hidden}{% endunless %}</style>
+<script>!function(){var d=document.documentElement,l=location,u=/[?&](hm_angle|hm_ad|hm_set|hm_cmp)=[^&]|[?&]utm_source=(facebook|fb|ig|instagram|meta)(&|#|$)/i.test(l.search),f=0;try{var s=JSON.parse(localStorage.getItem("hm"));f=s&&s.angle&&s.arm!="control"&&Date.now()-s.ts<864e5}catch(e){}(u||f)&&(d.classList.add("hm-pending"),(u||l.pathname=="/")&&d.classList.add("hm-a"),setTimeout(function(){d.classList.remove("hm-pending")},1200))}()</script>
+<script type="application/json" id="hm-config">{{ hm_cfg | json | replace: '<', '\u003c' }}</script>
+{%- unless block.settings.mode == 'blocks' %}
+<script type="application/json" id="hm-auto">{"headline":{{ hm_h | json }},"subheadline":{{ hm_s | json }},"media":{{ hm_m | json }}}</script>
+{%- endunless %}
+<script src="{{ 'hm.js' | asset_url }}" defer></script>
+  {%- endunless -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Hookmatch",
+  "target": "head",
+  "settings": [
+    {
+      "type": "select",
+      "id": "mode",
+      "label": "Mode",
+      "default": "auto",
+      "options": [
+        { "value": "auto", "label": "Auto: change my theme's hero" },
+        { "value": "blocks", "label": "Only Hookmatch blocks" }
+      ],
+      "info": "Auto swaps your theme's own hero headline, subheadline and image for matched ad visitors. Blocks you add still win where they exist."
+    },
+    { "type": "header", "content": "Advanced: CSS selectors" },
+    { "type": "text", "id": "headline_selector", "label": "Headline selector", "info": "For advanced use. A CSS selector for the headline to swap, such as .banner__heading. Leave empty to find it automatically." },
+    { "type": "text", "id": "subheadline_selector", "label": "Subheadline selector", "info": "For advanced use. A CSS selector for the subheadline to swap. Leave empty to find it automatically." },
+    { "type": "text", "id": "media_selector", "label": "Media selector", "info": "For advanced use. A CSS selector for the hero image or video to swap, such as .banner__media img. Leave empty to find it automatically." }
+  ]
+}
+{% endschema %}

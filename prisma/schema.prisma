@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
+// enough when changing adapters.
+// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Session {
+  id            String    @id
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+  refreshToken        String?
+  refreshTokenExpires DateTime?
+}
+
+// Daily beacon counts per (angle, arm, ad). "" means no angle / no ad so the unique key works.
+model Hit {
+  id           Int      @id @default(autoincrement())
+  shop         String
+  day          DateTime @db.Date
+  angleId      String   @default("")
+  arm          String
+  adId         String   @default("")
+  adName       String   @default("")
+  adsetId      String   @default("")
+  adsetName    String   @default("")
+  campaignId   String   @default("")
+  campaignName String   @default("")
+  count        Int      @default(0)
+
+  @@unique([shop, day, angleId, arm, adId])
+  @@index([shop, day])
+}
+
+model Ad {
+  id           Int      @id @default(autoincrement())
+  shop         String
+  adId         String
+  adName       String   @default("")
+  adsetId      String   @default("")
+  adsetName    String   @default("")
+  campaignId   String   @default("")
+  campaignName String   @default("")
+  firstSeen    DateTime @default(now())
+  lastSeen     DateTime @default(now())
+
+  @@unique([shop, adId])
+}
+
+model Attribution {
+  id        Int      @id @default(autoincrement())
+  shop      String
+  orderId   String
+  angleId   String   @default("")
+  arm       String   @default("")
+  adId      String   @default("")
+  total     Decimal  @db.Decimal(14, 2)
+  currency  String
+  createdAt DateTime @default(now())
+
+  @@unique([shop, orderId])
+  @@index([shop, createdAt])
+}

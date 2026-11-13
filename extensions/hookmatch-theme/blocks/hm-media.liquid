@@ -1,0 +1,52 @@
+{%- comment -%}
+  Hookmatch app block: matched media. Renders the merchant default image server-side as the
+  data-hm-slot="media" element with width/height set; hm.js swaps it for an image or video of the
+  same size for matched visitors. With no default image the slot is an empty hidden img of the
+  chosen ratio, so nothing shows to other visitors.
+{%- endcomment -%}
+{%- assign hm_style = '' -%}
+{%- if block.settings.align != 'inherit' -%}{%- capture hm_style %}{{ hm_style }}--hm-align:{{ block.settings.align }};{% endcapture -%}{%- endif -%}
+{%- if block.settings.max_width > 0 -%}{%- capture hm_style %}{{ hm_style }}--hm-max:{{ block.settings.max_width }}px;{% endcapture -%}{%- endif -%}
+{%- if block.settings.radius > 0 -%}{%- capture hm_style %}{{ hm_style }}--hm-radius:{{ block.settings.radius }}px;{% endcapture -%}{%- endif -%}
+{%- assign hm_img = block.settings.image -%}
+{%- assign hm_alt = hm_img.alt | default: block.settings.alt -%}
+{%- if hm_alt == blank -%}{%- assign hm_alt = 'hm.media_alt' | t -%}{%- endif -%}
+{%- assign hm_ratio = block.settings.ratio | default: '16:9' | split: ':' -%}
+{%- assign hm_w = 1600 -%}
+{%- assign hm_h = 1600 | times: hm_ratio[1] | divided_by: hm_ratio[0] -%}
+{%- if hm_img != blank -%}
+  {%- assign hm_w = hm_img.width -%}
+  {%- assign hm_h = hm_img.height -%}
+{%- endif -%}
+<div class="hm-block hm-media" style="{{ hm_style }}" {{ block.shopify_attributes }}>
+  {%- if hm_img != blank -%}
+  <img data-hm-slot="media" src="{{ hm_img | image_url: width: 1600 }}" srcset="{{ hm_img | image_url: width: 800 }} 800w, {{ hm_img | image_url: width: 1600 }} 1600w" sizes="(min-width: 990px) 50vw, 100vw" width="{{ hm_w }}" height="{{ hm_h }}" alt="{{ hm_alt | escape }}" style="aspect-ratio:{{ hm_w }}/{{ hm_h }};{% if block.settings.radius > 0 %}border-radius:var(--hm-radius);{% endif %}" loading="{{ block.settings.loading }}">
+  {%- elsif request.design_mode -%}
+  <img data-hm-slot="media" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" width="{{ hm_w }}" height="{{ hm_h }}" alt="{{ 'hm.empty_media' | t }}" style="aspect-ratio:{{ hm_w }}/{{ hm_h }};outline:1px dashed currentColor">
+  {%- else -%}
+  <img data-hm-slot="media" hidden width="{{ hm_w }}" height="{{ hm_h }}" alt="{{ hm_alt | escape }}" style="aspect-ratio:{{ hm_w }}/{{ hm_h }}">
+  {%- endif -%}
+  {%- if request.design_mode -%}<small class="hm-hint">{{ 'hm.design_hint' | t }}</small>{%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Matched media",
+  "target": "content",
+  "stylesheet": "hm.css",
+  "settings": [
+    { "type": "header", "content": "Default content" },
+    { "type": "image_picker", "id": "image", "label": "Default image", "info": "Leave empty to show nothing unless a matched ad visitor arrives." },
+    { "type": "text", "id": "alt", "label": "Alt text (when the image has none)" },
+    { "type": "select", "id": "ratio", "label": "Ratio when there is no default image", "default": "16:9",
+      "options": [ { "value": "16:9", "label": "16:9 landscape" }, { "value": "4:3", "label": "4:3" }, { "value": "1:1", "label": "1:1 square" }, { "value": "4:5", "label": "4:5 portrait" }, { "value": "9:16", "label": "9:16 tall" } ] },
+    { "type": "select", "id": "loading", "label": "Loading", "default": "eager",
+      "options": [ { "value": "eager", "label": "Eager (top of the page)" }, { "value": "lazy", "label": "Lazy (below the fold)" } ] },
+    { "type": "header", "content": "Style" },
+    { "type": "select", "id": "align", "label": "Alignment", "default": "inherit",
+      "options": [ { "value": "inherit", "label": "Theme default" }, { "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" } ] },
+    { "type": "range", "id": "max_width", "label": "Max width (px, 0 = full width)", "min": 0, "max": 1600, "step": 20, "unit": "px", "default": 0 },
+    { "type": "range", "id": "radius", "label": "Corner radius", "min": 0, "max": 40, "step": 1, "unit": "px", "default": 0 }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,40 @@
+{%- comment -%}
+  Hookmatch app block: matched badge. Renders the merchant default server-side inside
+  data-hm-slot="badge" (hidden when empty); hm.js swaps it and unhides it for matched visitors.
+{%- endcomment -%}
+{%- assign hm_style = '' -%}
+{%- if block.settings.align != 'inherit' -%}{%- capture hm_style %}{{ hm_style }}--hm-align:{{ block.settings.align }};{% endcapture -%}{%- endif -%}
+{%- if block.settings.color != blank and block.settings.color.alpha != 0.0 -%}{%- capture hm_style %}{{ hm_style }}--hm-color:{{ block.settings.color }};{% endcapture -%}{%- endif -%}
+{%- if block.settings.background != blank and block.settings.background.alpha != 0.0 -%}{%- capture hm_style %}{{ hm_style }}--hm-bg:{{ block.settings.background }};{% endcapture -%}{%- endif -%}
+{%- if block.settings.size > 0 -%}{%- capture hm_style %}{{ hm_style }}--hm-size:{{ block.settings.size }}px;{% endcapture -%}{%- endif -%}
+{%- if block.settings.radius >= 0 -%}{%- capture hm_style %}{{ hm_style }}--hm-radius:{{ block.settings.radius }}px;{% endcapture -%}{%- endif -%}
+{%- assign hm_text = block.settings.text -%}
+<div class="hm-block hm-badge" style="{{ hm_style }}" {{ block.shopify_attributes }}>
+  {%- if hm_text != blank -%}
+  <span data-hm-slot="badge">{{ hm_text | escape }}</span>
+  {%- elsif request.design_mode -%}
+  <span data-hm-slot="badge">{{ 'hm.empty_badge' | t }}</span>
+  {%- else -%}
+  <span data-hm-slot="badge" hidden></span>
+  {%- endif -%}
+  {%- if request.design_mode -%}<small class="hm-hint">{{ 'hm.design_hint' | t }}</small>{%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Matched badge",
+  "target": "content",
+  "stylesheet": "hm.css",
+  "settings": [
+    { "type": "header", "content": "Default content" },
+    { "type": "text", "id": "text", "label": "Default badge text", "info": "Leave empty to show nothing unless a matched ad visitor arrives." },
+    { "type": "header", "content": "Style" },
+    { "type": "select", "id": "align", "label": "Alignment", "default": "inherit",
+      "options": [ { "value": "inherit", "label": "Theme default" }, { "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" } ] },
+    { "type": "range", "id": "size", "label": "Size (px, 0 = default)", "min": 0, "max": 32, "step": 1, "unit": "px", "default": 0 },
+    { "type": "color", "id": "color", "label": "Text color" },
+    { "type": "color", "id": "background", "label": "Background color" },
+    { "type": "range", "id": "radius", "label": "Corner radius", "min": 0, "max": 40, "step": 1, "unit": "px", "default": 20 }
+  ]
+}
+{% endschema %}

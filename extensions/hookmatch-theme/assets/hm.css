@@ -1,0 +1,10 @@
+.hm-block{margin:0;text-align:var(--hm-align,inherit);color:var(--hm-color,inherit);font-size:var(--hm-size,inherit)}
+.hm-block [data-hm-slot]{margin:0;color:inherit;font-size:inherit}
+.hm-block [hidden]{display:none}
+.hm-badge{display:block;text-align:var(--hm-align,inherit)}
+.hm-badge [data-hm-slot]{display:inline-block;padding:.35em .8em;border-radius:var(--hm-radius,999px);background:var(--hm-bg,#111);color:var(--hm-color,#fff);font-size:var(--hm-size,.875rem);font-weight:600;line-height:1.2}
+.hm-media{display:block;text-align:var(--hm-align,inherit)}
+.hm-media [data-hm-slot]{display:inline-block;width:100%;max-width:var(--hm-max,100%);height:auto;vertical-align:top;object-fit:cover}
+.hm-media [data-hm-slot][hidden]{display:none}
+.hm-hint{display:block;margin-top:.25rem;font-size:.75rem;opacity:.65}
+.hm-block:has(>[data-hm-slot][hidden]),.shopify-app-block:has(>.hm-block>[data-hm-slot][hidden]){display:none}

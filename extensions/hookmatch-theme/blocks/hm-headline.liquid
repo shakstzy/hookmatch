@@ -1,0 +1,38 @@
+{%- comment -%}
+  Hookmatch app block: matched headline. Renders the merchant default server-side inside
+  data-hm-slot="headline"; hm.js swaps it for visitors from a matched ad.
+{%- endcomment -%}
+{%- assign hm_style = '' -%}
+{%- if block.settings.align != 'inherit' -%}{%- capture hm_style %}{{ hm_style }}--hm-align:{{ block.settings.align }};{% endcapture -%}{%- endif -%}
+{%- if block.settings.color != blank and block.settings.color.alpha != 0.0 -%}{%- capture hm_style %}{{ hm_style }}--hm-color:{{ block.settings.color }};{% endcapture -%}{%- endif -%}
+{%- if block.settings.size > 0 -%}{%- capture hm_style %}{{ hm_style }}--hm-size:{{ block.settings.size }}px;{% endcapture -%}{%- endif -%}
+{%- assign hm_text = block.settings.text -%}
+{%- assign hm_tag = block.settings.tag | default: 'h2' -%}
+<div class="hm-block hm-headline" style="{{ hm_style }}" {{ block.shopify_attributes }}>
+  {%- if hm_text != blank -%}
+  <{{ hm_tag }} data-hm-slot="headline">{{ hm_text | escape }}</{{ hm_tag }}>
+  {%- elsif request.design_mode -%}
+  <{{ hm_tag }} data-hm-slot="headline">{{ 'hm.empty_headline' | t }}</{{ hm_tag }}>
+  {%- else -%}
+  <{{ hm_tag }} data-hm-slot="headline" hidden></{{ hm_tag }}>
+  {%- endif -%}
+  {%- if request.design_mode -%}<small class="hm-hint">{{ 'hm.design_hint' | t }}</small>{%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Matched headline",
+  "target": "content",
+  "stylesheet": "hm.css",
+  "settings": [
+    { "type": "header", "content": "Default content" },
+    { "type": "text", "id": "text", "label": "Default headline", "info": "Leave empty to show nothing unless a matched ad visitor arrives." },
+    { "type": "header", "content": "Style" },
+    { "type": "select", "id": "tag", "label": "Text element", "default": "h2", "options": [ { "value": "h1", "label": "Heading 1" }, { "value": "h2", "label": "Heading 2" }, { "value": "h3", "label": "Heading 3" }, { "value": "p", "label": "Paragraph" }, { "value": "div", "label": "Plain" } ] },
+    { "type": "select", "id": "align", "label": "Alignment", "default": "inherit",
+      "options": [ { "value": "inherit", "label": "Theme default" }, { "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" } ] },
+    { "type": "range", "id": "size", "label": "Size (px, 0 = theme default)", "min": 0, "max": 96, "step": 1, "unit": "px", "default": 0 },
+    { "type": "color", "id": "color", "label": "Text color" }
+  ]
+}
+{% endschema %}
