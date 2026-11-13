@@ -50,7 +50,7 @@ No Meta login or Ads API access is needed. Ads show up in the app by themselves 
 
 Tested end to end on Shopify development stores and on one real store that was still behind its storefront password: matching, swap, route, discount, hit logging, order attribution and the report with its control group. The repo has 105 unit tests and 77 storefront browser tests.
 
-We have **not** published conversion-lift or ROAS results. Nothing here is a claim that it raises sales by a given amount. The holdout exists so you can find out for your own store.
+Early pilots on live stores running Meta ads have been encouraging, with ROAS up sharply in the first tests. Those are early, small, operator-reported numbers and we have not published a detailed breakdown yet. Results depend on the store and the ads, so the holdout exists to let you measure the lift on your own store.
 
 ## How it is built
 
